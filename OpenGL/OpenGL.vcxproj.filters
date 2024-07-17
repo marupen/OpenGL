@@ -28,8 +28,8 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shader.fs" />
-    <None Include="shader.vs" />
-    <None Include="yellow_shader.fs" />
+    <None Include="shader.frag" />
+    <None Include="shader.vert" />
+    <None Include="yellow_shader.frag" />
   </ItemGroup>
 </Project>

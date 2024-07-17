@@ -35,18 +35,18 @@ int main()
     }
 
     //  омпилирование нашей шейдерной программы
-    Shader ourShader("shader.vs", "shader.fs");  // путь к файлам шейдеров
-    Shader YellowShader("shader.vs", "yellow_shader.fs");
+    Shader ourShader("shader.vert", "shader.frag");  // путь к файлам шейдеров
+    Shader YellowShader("shader.vert", "yellow_shader.frag");
 
     float vertices1[] = {
-        -0.5f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // верхн€€ права€
-         0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,  // нижн€€ права€
-        -0.0f, -0.0f, 0.0f, 0.0f, 0.0f, 1.0f  // нижн€€ лева€
+        -0.5f, -1.0f, 0.0f, 1.0f, 0.0f, 0.0f,
+         0.5f, -1.0f, 0.0f, 0.0f, 1.0f, 0.0f,
+        -0.0f, -0.0f, 0.0f, 0.0f, 0.0f, 1.0f
         };
     float vertices2[] = {
-        -0.0f,  0.0f, 0.0f,  // верхн€€ лева€
-         0.5f,  1.0f, 0.0f,  // нижн€€ лева€
-        -0.5f,  1.0f, 0.0f   // верхн€€ лева€ 
+        -0.0f,  0.0f, 0.0f,
+         0.5f,  1.0f, 0.0f,
+        -0.5f,  1.0f, 0.0f
     };
     unsigned int indices[] = {
         0, 1, 3, // первый треугольник
@@ -88,12 +88,12 @@ int main()
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        ourShader.use();
-
         /*float timeValue = glfwGetTime();
         float greenValue = (sin(timeValue) / 2.0f) + 0.5f;
         int vertexColorLocation = glGetUniformLocation(shaderProgramOrange, "ourColor");
         glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);*/
+        ourShader.use();
+        ourShader.setFloat("offset", 0.5f);
 
         glBindVertexArray(VAOs[0]);
         glDrawArrays(GL_TRIANGLES, 0, 3);
