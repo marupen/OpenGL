@@ -11,6 +11,8 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+float texturesProportion = 0.5f;
+
 int main()
 {
     glfwInit();
@@ -90,8 +92,8 @@ int main()
     // Устанавливаем параметры наложения и фильтрации текстур (для текущего связанного объекта текстуры)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true);
@@ -115,8 +117,8 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     // Установка параметров фильтрации текстуры
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
     // Загрузка изображения, создание текстуры и генерирование мипмап-уровней
     data = stbi_load("../textures/awesomeface.png", &width, &height, &nrChannels, 0);
@@ -143,12 +145,11 @@ int main()
     glEnableVertexAttribArray(0);*/
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
+    
     while (!glfwWindowShouldClose(window))
     {
         //Обработка ввода
         processInput(window);
-
 
         //Рендеринг
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
@@ -168,6 +169,7 @@ int main()
 
         //Рендеринг ящика
         ourShader.use();
+        ourShader.setFloat("texturesProportion", texturesProportion);
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 
@@ -188,6 +190,10 @@ void processInput(GLFWwindow* window)
 {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
+    if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && texturesProportion < 1.0f)
+        texturesProportion += 0.001f;
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && texturesProportion > 0.0f)
+        texturesProportion -= 0.001f;
 }
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
