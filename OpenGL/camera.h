@@ -5,6 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include <vector>
+#include <iostream>
 
 enum Camera_Movement {
     FORWARD,
@@ -59,7 +60,7 @@ public:
     // ¬озвращает матрицу вида, вычисленную с использованием углов Ёйлера и LookAt-матрицы 
     glm::mat4 GetViewMatrix()
     {
-        return glm::lookAt(Position, Position + Front, Up);
+        return lookAtCamera(Position, Position + Front, Up);
     }
 
     //ќбрабатываем входные данные, полученные от любой клавиатуроподобной системы ввода. ѕринимаем входной параметр в виде определенного камерой перечислени€ (дл€ абстрагировани€ его от оконных систем)
@@ -124,5 +125,29 @@ private:
         // “акже пересчитываем вектор-вправо и вектор-вверх
         Right = glm::normalize(glm::cross(Front, WorldUp));  // Ќормализуем векторы, потому что их длина становитс€ стремитс€ к 0 тем больше, чем больше вы смотрите вверх или вниз, что приводит к более медленному движению.
         Up = glm::normalize(glm::cross(Right, Front));
+    }
+
+    glm::mat4 lookAtCamera(glm::vec3 cameraPos, glm::vec3 cameraTarget, glm::vec3 up)
+    {
+        glm::vec3 zaxis = glm::normalize(cameraPos - cameraTarget);
+        glm::vec3 xaxis = glm::normalize(glm::cross(glm::normalize(up), zaxis));
+        glm::vec3 yaxis = glm::cross(zaxis, xaxis);
+
+        glm::mat4 rotation = glm::mat4(1.0f);
+        rotation[0][0] = xaxis.x; // первый столбец, первый р€д
+        rotation[1][0] = xaxis.y;
+        rotation[2][0] = xaxis.z;
+        rotation[0][1] = yaxis.x; // первый столбец, второй р€д
+        rotation[1][1] = yaxis.y;
+        rotation[2][1] = yaxis.z;
+        rotation[0][2] = zaxis.x; // первый столбец, третий р€д
+        rotation[1][2] = zaxis.y;
+        rotation[2][2] = zaxis.z;
+
+        glm::mat4 translation = glm::mat4(1.0f);
+        translation[3][0] = -cameraPos.x;
+        translation[3][1] = -cameraPos.y;
+        translation[3][2] = -cameraPos.z;
+        return rotation * translation;
     }
 };
