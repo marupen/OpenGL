@@ -2,6 +2,7 @@
 #include <GLFW/glfw3.h>
 #include "shader_s.h"
 #include "stb_image.h"
+#include "camera.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -9,12 +10,32 @@
 #include <random>
 
 void processInput(GLFWwindow* window);
+void mouse_callback(GLFWwindow* window, double xpos, double ypos);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+Camera* camera;
+
+glm::vec3 cameraPos = glm::vec3(0.0f, 0.0f, 3.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, 0.0f, -1.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 1.0f, 0.0f);
+
+float lastX = 400, lastY = 300;
+float yaw = -90.0f, pitch = 0.0f;
+bool firstMouse = true;
+
+float fov = 60.0f;
+
+float deltaTime = 0.0f;	// время между текущим и последним кадрами
+float lastFrame = 0.0f; // время последнего кадра
+
 float texturesProportion = 20.0f;
+const float radius = 10.0f;
+
+bool mode = true;
 
 int main()
 {
@@ -33,6 +54,8 @@ int main()
 
     glfwMakeContextCurrent(window);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetCursorPosCallback(window, mouse_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
@@ -205,8 +228,10 @@ int main()
     glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));*/
 
     glEnable(GL_DEPTH_TEST);
-    glm::mat4 projection = glm::perspective(glm::radians(60.0f), 800.0f / 600.0f, 0.1f, 100.0f);
-    ourShader.setMat4("projection", projection);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+    glm::mat4 projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+    //ourShader.setMat4("projection", projection);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -226,7 +251,14 @@ int main()
         //Рендеринг ящиков
         ourShader.use();
         //ourShader.setFloat("texturesProportion", texturesProportion);
-        projection = glm::perspective(glm::radians(60.0f), 800.0f / 600.0f, 0.1f, texturesProportion);
+        if (mode)
+        {
+            projection = glm::perspective(glm::radians(fov), 800.0f / 600.0f, 0.1f, 100.0f);
+        }
+        else
+        {
+            projection = glm::ortho(-6.0f, 6.0f, -8.0f, 8.0f, 0.1f, 100.0f);
+        }
         ourShader.setMat4("projection", projection);
         glBindVertexArray(VAO);
 
@@ -242,9 +274,10 @@ int main()
             }
             model = glm::rotate(model, (float)glfwGetTime() * glm::radians(angle), glm::vec3(1.0f, 0.3f, 0.5f));
             ourShader.setMat4("model", model);
-            glm::mat4 view = glm::mat4(1.0f);
-            // перемещаем сцену в направлении, обратном направлению предполагаемого движения
-            view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+            float camX = sin(glfwGetTime()) * radius;
+            float camZ = cos(glfwGetTime()) * radius;
+            glm::mat4 view;
+            view = camera->GetViewMatrix();
             ourShader.setMat4("view", view);
             glDrawArrays(GL_TRIANGLES, 0, 36);
         }
@@ -252,20 +285,62 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
-
+    delete camera;
     glfwTerminate();
     return 0;
 }
 
 void processInput(GLFWwindow* window)
 {
+    float currentFrame = glfwGetTime();
+    deltaTime = currentFrame - lastFrame;
+    lastFrame = currentFrame;
+
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
     if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS && texturesProportion < 100.0f)
         texturesProportion += 0.01f;
     if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS && texturesProportion > 1.0f)
         texturesProportion -= 0.01f;
+
+    // настройки камеры
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+        camera->ProcessKeyboard(Camera_Movement::FORWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+        camera->ProcessKeyboard(Camera_Movement::BACKWARD, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+        camera->ProcessKeyboard(Camera_Movement::LEFT, deltaTime);
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+        camera->ProcessKeyboard(Camera_Movement::RIGHT, deltaTime);
+
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+        mode = false;
+    if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_RELEASE)
+        mode = true;
 }
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+    if (firstMouse)
+    {
+        lastX = xpos;
+        lastY = ypos;
+        firstMouse = false;
+    }
+
+    float xoffset = xpos - lastX;
+    float yoffset = lastY - ypos; // уменьшаемое и вычитаемое поменяны местами, так как диапазон y-координаты определяется снизу вверх
+    lastX = xpos;
+    lastY = ypos;
+
+    camera->ProcessMouseMovement(xoffset, yoffset);
+}
+
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    camera->ProcessMouseScroll(yoffset);
+};
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 {
