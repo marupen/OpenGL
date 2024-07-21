@@ -39,6 +39,6 @@
   <ItemGroup>
     <None Include="shader.frag" />
     <None Include="shader.vert" />
-    <None Include="yellow_shader.frag" />
+    <None Include="light_cube_shader.frag" />
   </ItemGroup>
 </Project>
