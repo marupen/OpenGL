@@ -32,6 +32,7 @@ float fov = 60.0f;
 float deltaTime = 0.0f;	// время между текущим и последним кадрами
 float lastFrame = 0.0f; // время последнего кадра
 
+const glm::vec3 StartLightPos(1.2f, 1.0f, 2.0f);
 glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 
 float texturesProportion = 20.0f;
@@ -143,6 +144,11 @@ int main()
     glEnableVertexAttribArray(0);
 
     camera = new Camera(glm::vec3(0.0f, 0.0f, 3.0f));
+    lightingShader.use();
+    lightingShader.setVec3("material.ambient", 0.24725f, 0.1995f, 0.0745f);
+    lightingShader.setVec3("material.diffuse", 0.75164f, 0.60648f, 0.22648f);
+    lightingShader.setVec3("material.specular", 0.628281f, 0.555802f, 0.366065f);
+    lightingShader.setFloat("material.shininess", 0.4f);
 
     while (!glfwWindowShouldClose(window))
     {
@@ -152,11 +158,18 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        lightPos.x = StartLightPos.x * sin((float)glfwGetTime());
+        lightPos.y = StartLightPos.y * cos((float)glfwGetTime());
+
         //Рендеринг ящиков
         lightingShader.use();
         lightingShader.setVec3("objectColor", 1.0f, 0.5f, 0.31f);
-        lightingShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
-        lightingShader.setVec3("lightPos", lightPos);
+        lightingShader.setVec3("light.position", lightPos);
+        lightingShader.setVec3("viewPos", camera->Position);
+
+        lightingShader.setVec3("light.ambient", 0.2f, 0.2f, 0.2f);
+        lightingShader.setVec3("light.diffuse", 0.5f, 0.5f, 0.5f);
+        lightingShader.setVec3("light.specular", 1.0f, 1.0f, 1.0f);
 
         glm::mat4 projection = glm::perspective(glm::radians(camera->Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
         lightingShader.setMat4("projection", projection);
@@ -172,6 +185,7 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         lampShader.use();
+        lampShader.setVec3("lightColor", glm::vec3(1.0f));
         lampShader.setMat4("projection", projection);
         lampShader.setMat4("view", view);
         model = glm::mat4(1.0f);

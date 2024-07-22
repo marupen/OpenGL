@@ -75,8 +75,6 @@ public:
             Position -= Right * velocity;
         if (direction == RIGHT)
             Position += Right * velocity;
-
-        Position.y = 0.0f;
     }
 
     //ќбрабатываем входные данные, полученные от системы ввода с помощью мыши. ќжидаем в качестве параметров значени€ смещени€ как в направлении X, так и в направлении Y.
