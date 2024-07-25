@@ -73,8 +73,11 @@ int main()
     glDepthFunc(GL_LESS); // тест глубины всегда проходит успешно (аналогично glDisable(GL_DEPTH_TEST))
     glEnable(GL_STENCIL_TEST);
     glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-    glEnable(GL_BLEND);
+    glEnable(GL_BLEND); // смешивание
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_CULL_FACE); // режим отсечения граней
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
 
     // Компилирование шейдерной программы
     Shader shader("shader.vert", "depth_shader.frag");
@@ -91,18 +94,18 @@ int main()
        -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
 
        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
         0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-        0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
-       -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
        -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+       -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
 
        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+       -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
        -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-       -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
-       -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
        -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+       -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -112,11 +115,11 @@ int main()
         0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
 
        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
         0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
         0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-        0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
-       -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
        -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+       -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
 
        -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
         0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
@@ -248,6 +251,7 @@ int main()
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
         // Окна
+        glDisable(GL_CULL_FACE);
         std::map<float, glm::vec3> sorted;
         for (unsigned int i = 0; i < vegetation.size(); i++)
         {
@@ -263,6 +267,7 @@ int main()
             shader.setMat4("model", model);
             glDrawArrays(GL_TRIANGLES, 0, 6);
         }
+        glEnable(GL_CULL_FACE);
 
         /*singleColorShader.use();
         singleColorShader.setMat4("view", view);
