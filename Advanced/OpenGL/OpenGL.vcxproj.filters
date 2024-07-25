@@ -58,5 +58,7 @@
     <None Include="model_loading.frag" />
     <None Include="depth_shader.frag" />
     <None Include="single_color_shader.frag" />
+    <None Include="framebuffer.vert" />
+    <None Include="framebuffer.frag" />
   </ItemGroup>
 </Project>

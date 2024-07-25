@@ -150,6 +150,8 @@
   <ItemGroup>
     <None Include="depth_shader.frag" />
     <None Include="directional_light_shader.frag" />
+    <None Include="framebuffer.frag" />
+    <None Include="framebuffer.vert" />
     <None Include="model_loading.frag" />
     <None Include="point_light_shader.frag" />
     <None Include="shader.frag" />
