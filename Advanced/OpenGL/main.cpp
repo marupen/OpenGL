@@ -363,22 +363,22 @@ int main()
         camera.ProcessMouseMovement(0, 0, true);
         glm::mat4 projection = glm::perspective(glm::radians(camera.Zoom), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
 
-        // Рендер скайбокса
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
-        skyboxShader.use();
-        skyboxShader.setMat4("view", view);
-        skyboxShader.setMat4("projection", projection);
+        //// Рендер скайбокса
+        //glDisable(GL_DEPTH_TEST);
+        //glDisable(GL_CULL_FACE);
+        //skyboxShader.use();
+        //skyboxShader.setMat4("view", view);
+        //skyboxShader.setMat4("projection", projection);
 
-        // Куб скайбокса
-        glBindVertexArray(skyboxVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
+        //// Куб скайбокса
+        //glBindVertexArray(skyboxVAO);
+        //glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        //glDrawArrays(GL_TRIANGLES, 0, 36);
+        //glBindVertexArray(0);
 
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        //glEnable(GL_DEPTH_TEST);
+        //glEnable(GL_CULL_FACE);
 
         shader.use();
         camera.Pitch += 180.0f; // поворачиваем камеру на 180 градусов
@@ -412,7 +412,23 @@ int main()
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
+        glDisable(GL_CULL_FACE);
+        // Рендер скайбокса
+        glDepthFunc(GL_LEQUAL); // меняем функцию глубины, чтобы обеспечить прохождение теста глубины, когда значения равны содержимому буфера глубины
+        skyboxShader.use();
+        skyboxShader.setMat4("view", glm::mat4(glm::mat3(view)));
+        skyboxShader.setMat4("projection", projection);
+
+        // Куб скайбокса
+        glBindVertexArray(skyboxVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthFunc(GL_LESS); // восстанавливаем стандартное значение функции теста глубины
+
         // Окна
+        shader.use();
         glDisable(GL_CULL_FACE);
         std::map<float, glm::vec3> sorted;
         for (unsigned int i = 0; i < vegetation.size(); i++)
@@ -438,23 +454,23 @@ int main()
         glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
-        // Рендер скайбокса
-        glDisable(GL_DEPTH_TEST);
-        glDisable(GL_CULL_FACE);
-        skyboxShader.use();
-        view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // убираем из матрицы вида секцию, отвечающую за операцию трансляции
-        skyboxShader.setMat4("view", view);
-        skyboxShader.setMat4("projection", projection);
+        //// Рендер скайбокса
+        //glDisable(GL_DEPTH_TEST);
+        //glDisable(GL_CULL_FACE);
+        //skyboxShader.use();
+        //view = glm::mat4(glm::mat3(camera.GetViewMatrix())); // убираем из матрицы вида секцию, отвечающую за операцию трансляции
+        //skyboxShader.setMat4("view", view);
+        //skyboxShader.setMat4("projection", projection);
 
-        // Куб скайбокса
-        glBindVertexArray(skyboxVAO);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
-        glBindVertexArray(0);
+        //// Куб скайбокса
+        //glBindVertexArray(skyboxVAO);
+        //glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        //glDrawArrays(GL_TRIANGLES, 0, 36);
+        //glBindVertexArray(0);
 
-        glEnable(GL_DEPTH_TEST);
-        glEnable(GL_CULL_FACE);
+        //glEnable(GL_DEPTH_TEST);
+        //glEnable(GL_CULL_FACE);
 
         shader.use();
         model = glm::mat4(1.0f);
@@ -485,9 +501,25 @@ int main()
         model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
+        
+        glDisable(GL_CULL_FACE);
+
+        // Рендер скайбокса
+        glDepthFunc(GL_LEQUAL); // меняем функцию глубины, чтобы обеспечить прохождение теста глубины, когда значения равны содержимому буфера глубины
+        skyboxShader.use();
+        skyboxShader.setMat4("view", view);
+        skyboxShader.setMat4("projection", projection);
+
+        // Куб скайбокса
+        glBindVertexArray(skyboxVAO);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glBindVertexArray(0);
+        glDepthFunc(GL_LESS); // восстанавливаем стандартное значение функции теста глубины
 
         // Окна
-        glDisable(GL_CULL_FACE);
+        shader.use();
         sorted.clear();
         for (unsigned int i = 0; i < vegetation.size(); i++)
         {
