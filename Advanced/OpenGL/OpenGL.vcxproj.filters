@@ -60,5 +60,7 @@
     <None Include="single_color_shader.frag" />
     <None Include="framebuffer.vert" />
     <None Include="framebuffer.frag" />
+    <None Include="skybox.vert" />
+    <None Include="skybox.frag" />
   </ItemGroup>
 </Project>

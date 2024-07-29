@@ -158,6 +158,8 @@
     <None Include="shader.vert" />
     <None Include="light_cube_shader.frag" />
     <None Include="single_color_shader.frag" />
+    <None Include="skybox.frag" />
+    <None Include="skybox.vert" />
     <None Include="spotlight_shader.frag" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
