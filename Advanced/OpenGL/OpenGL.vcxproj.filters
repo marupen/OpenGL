@@ -64,5 +64,7 @@
     <None Include="skybox.frag" />
     <None Include="mirror.vert" />
     <None Include="mirror.frag" />
+    <None Include="refraction.vert" />
+    <None Include="refraction.frag" />
   </ItemGroup>
 </Project>

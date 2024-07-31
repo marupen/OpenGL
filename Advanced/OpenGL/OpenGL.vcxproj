@@ -156,6 +156,8 @@
     <None Include="mirror.vert" />
     <None Include="model_loading.frag" />
     <None Include="point_light_shader.frag" />
+    <None Include="refraction.frag" />
+    <None Include="refraction.vert" />
     <None Include="shader.frag" />
     <None Include="shader.vert" />
     <None Include="light_cube_shader.frag" />

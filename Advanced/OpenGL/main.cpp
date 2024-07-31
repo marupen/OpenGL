@@ -89,6 +89,7 @@ int main()
     Shader screenShader("framebuffer.vert", "framebuffer.frag");
     Shader skyboxShader("skybox.vert", "skybox.frag");
     Shader mirrorShader("mirror.vert", "mirror.frag");
+    Shader refractShader("refraction.vert", "refraction.frag");
 
     // Указание вершинных данных (буффера(-ов)) и настройка вершинных атрибутов
     float cubeVertices[] = {
@@ -366,8 +367,11 @@ int main()
     skyboxShader.use();
     skyboxShader.setInt("skybox", 0);
 
-    skyboxShader.use();
-    skyboxShader.setInt("skybox", 0);
+    mirrorShader.use();
+    mirrorShader.setInt("skybox", 0);
+
+    refractShader.use();
+    refractShader.setInt("skybox", 0);
 
     // Конфигурация фреймбуфера
     unsigned int framebuffer;
@@ -397,6 +401,7 @@ int main()
     if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         std::cout << "ERROR::FRAMEBUFFER:: Framebuffer is not complete!" << std::endl;
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glEnable(GL_PROGRAM_POINT_SIZE);
     //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     // Цикл рендеринга
     while (!glfwWindowShouldClose(window))
@@ -560,24 +565,34 @@ int main()
         glBindTexture(GL_TEXTURE_2D, cubeTexture);
         model = glm::translate(model, glm::vec3(-1.0f, 0.0f, -1.0f));
         shader.setMat4("model", model);
-        glDrawArrays(GL_TRIANGLES, 0, 36);
+        glDrawArrays(GL_POINTS, 0, 36);
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(2.0f, 0.0f, 0.0f));
         shader.setMat4("model", model);
         glDrawArrays(GL_TRIANGLES, 0, 36);
 
-        // Рендер зеркального куба
+        // Рендер зеркального рюкзака
         mirrorShader.use();
         mirrorShader.setVec3("cameraPos", camera.Position);
-        glBindVertexArray(mirrorCubeVAO);
+        /*glBindVertexArray(mirrorCubeVAO);
         glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);
+        glBindTexture(GL_TEXTURE_CUBE_MAP, cubemapTexture);*/
         model = glm::mat4(1.0f);
         model = glm::translate(model, glm::vec3(-1.0f, 5.0f, -1.0f));
         mirrorShader.setMat4("model", model);
         mirrorShader.setMat4("view", view);
         mirrorShader.setMat4("projection", projection);
         backpack->Draw(mirrorShader);
+
+        // Рендер стеклянного рюкзака
+        refractShader.use();
+        refractShader.setVec3("cameraPos", camera.Position);
+        model = glm::mat4(1.0f);
+        model = glm::translate(model, glm::vec3(2.0f, 5.0f, 0.0f));
+        refractShader.setMat4("model", model);
+        refractShader.setMat4("view", view);
+        refractShader.setMat4("projection", projection);
+        backpack->Draw(refractShader);
         
         glDisable(GL_CULL_FACE);
 
