@@ -62,5 +62,7 @@
     <None Include="framebuffer.frag" />
     <None Include="skybox.vert" />
     <None Include="skybox.frag" />
+    <None Include="mirror.vert" />
+    <None Include="mirror.frag" />
   </ItemGroup>
 </Project>
