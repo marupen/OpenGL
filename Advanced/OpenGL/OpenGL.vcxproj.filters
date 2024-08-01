@@ -66,5 +66,6 @@
     <None Include="mirror.frag" />
     <None Include="refraction.vert" />
     <None Include="refraction.frag" />
+    <None Include="geometry_shader.geom" />
   </ItemGroup>
 </Project>

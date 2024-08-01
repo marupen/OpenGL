@@ -152,6 +152,7 @@
     <None Include="directional_light_shader.frag" />
     <None Include="framebuffer.frag" />
     <None Include="framebuffer.vert" />
+    <None Include="geometry_shader.geom" />
     <None Include="mirror.frag" />
     <None Include="mirror.vert" />
     <None Include="model_loading.frag" />
